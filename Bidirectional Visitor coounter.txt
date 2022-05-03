@@ -1,0 +1,101 @@
+#include<reg51.h>
+sbit a1=P1^0;                                 
+sbit a2=P1^1;                                   
+sbit rs=P2^0;
+sbit rw=P2^1;
+sbit en=P2^2;
+void lcdcmd(unsigned char);
+void lcddat(unsigned char );
+void lcddis(unsigned char *,unsigned char);
+void entry_conversion(unsigned char);
+void exit_conversion(unsigned char);
+void delay();
+void main()
+{
+
+unsigned char s1,s2;
+lcdcmd(0x38);
+lcdcmd(0x10);
+lcdcmd(0x0c);
+lcdcmd(0x80);
+lcddis("WELCOME TO",10);
+lcdcmd(0xc0);
+lcddis("OFFICE",6);
+while(1)
+{
+lcdcmd(0x01);
+if(a1==0)
+{
+s1=s1+1;
+entry_conversion(s1);
+while(a1==0);
+}
+if(a2==0)
+{
+s2=s2+1;
+exit_conversion(s2);
+while(a2==0);
+}
+}
+}
+void lcdcmd(unsigned char val)
+{
+P3=val;
+rs=0;
+rw=0;
+en=1;
+delay();
+en=0;
+}
+void lcddat(unsigned char datas)
+{
+
+P3=datas;
+rs=1;
+rw=0;
+en=1;
+delay();
+en=0;
+}
+void lcddis(unsigned char *s, unsigned char r)
+{
+unsigned char s3;
+for(s3=0;s3<r;s3++)
+{
+lcddat(s[s3]);
+}
+}
+void delay()
+{
+unsigned int x;
+for(x=0;x<1275;x++);
+}
+void entry_conversion(unsigned char entry )
+{
+unsigned char s5,s6,s7;
+lcdcmd(0x01);
+lcddis("ENTRY:",6);
+s5=entry;
+s6=s5/10;
+s7=s5%10;
+s6=s6|0x30;
+s7=s7|0x30;
+lcdcmd(0x87);
+lcddat(s6);
+lcddat(s7);
+}
+void exit_conversion(unsigned char exit)
+{
+unsigned char s8,s9,s10;
+lcdcmd(0xc0);
+lcddis("exit:",5);
+s8=exit;
+s9=s8/10;
+s10=s8%10;
+s9=s9|0x30;
+s10=s10|0x30;
+lcdcmd(0xc6);
+lcddat(s9);
+lcddat(s10);
+}
+
